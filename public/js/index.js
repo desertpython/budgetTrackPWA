@@ -1,5 +1,5 @@
-let transactions = [];
-let myChart;
+let trans = [];
+let chart;
 
 fetch("/api/transaction")
   .then(response => {
@@ -7,7 +7,7 @@ fetch("/api/transaction")
   })
   .then(data => {
     // save db data on global variable
-    transactions = data;
+    trans = data;
 
     populateTotal();
     populateTable();
@@ -16,7 +16,7 @@ fetch("/api/transaction")
 
 function populateTotal() {
   // reduce transaction amounts to a single total value
-  let total = transactions.reduce((total, t) => {
+  let total = trans.reduce((total, t) => {
     return total + parseInt(t.value);
   }, 0);
 
@@ -28,12 +28,12 @@ function populateTable() {
   let tbody = document.querySelector("#tbody");
   tbody.innerHTML = "";
 
-  transactions.forEach(transaction => {
+  trans.forEach(trans => {
     // create and populate a table row
     let tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${transaction.name}</td>
-      <td>${transaction.value}</td>
+      <td>${trans.name}</td>
+      <td>${trans.value}</td>
     `;
 
     tbody.appendChild(tr);
@@ -42,7 +42,7 @@ function populateTable() {
 
 function populateChart() {
   // copy array and reverse it
-  let reversed = transactions.slice().reverse();
+  let reversed = trans.slice().reverse();
   let sum = 0;
 
   // create date labels for chart
@@ -58,13 +58,13 @@ function populateChart() {
   });
 
   // remove old chart if it exists
-  if (myChart) {
-    myChart.destroy();
+  if (chart) {
+    chart.destroy();
   }
 
-  let ctx = document.getElementById("myChart").getContext("2d");
+  let ctx = document.getElementById("chart").getContext("2d");
 
-  myChart = new Chart(ctx, {
+  chart = new Chart(ctx, {
     type: 'line',
       data: {
         labels,
@@ -93,7 +93,7 @@ function sendTransaction(isAdding) {
   }
 
   // create record
-  let transaction = {
+  let trans = {
     name: nameEl.value,
     value: amountEl.value,
     date: new Date().toISOString()
@@ -101,11 +101,11 @@ function sendTransaction(isAdding) {
 
   // if subtracting funds, convert amount to negative number
   if (!isAdding) {
-    transaction.value *= -1;
+    trans.value *= -1;
   }
 
   // add to beginning of current array of data
-  transactions.unshift(transaction);
+  trans.unshift(trans);
 
   // re-run logic to populate ui with new record
   populateChart();
@@ -115,7 +115,7 @@ function sendTransaction(isAdding) {
   // also send to server
   fetch("/api/transaction", {
     method: "POST",
-    body: JSON.stringify(transaction),
+    body: JSON.stringify(trans),
     headers: {
       Accept: "application/json, text/plain, */*",
       "Content-Type": "application/json"
@@ -136,7 +136,7 @@ function sendTransaction(isAdding) {
   })
   .catch(err => {
     // fetch failed, so save in indexed db
-    saveRecord(transaction);
+    saveRecord(trans);
 
     // clear form
     nameEl.value = "";
