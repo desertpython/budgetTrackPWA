@@ -22,7 +22,7 @@ request.onsuccess = ({
 }) => {
     db = target.result;
 
-    // check if app is online before reading from db
+   
     if (navigator.onLine) {
         checkDatabase();
     }
@@ -58,7 +58,7 @@ function checkDatabase() {
                     return response.json();
                 })
                 .then(() => {
-                    // delete records if successful
+                   
                     const transaction = db.transaction(["pending"], "readwrite");
                     const store = transaction.objectStore("pending");
                     store.clear();
@@ -67,5 +67,4 @@ function checkDatabase() {
     };
 }
 
-// listen for app coming back online
 window.addEventListener("online", checkDatabase);
