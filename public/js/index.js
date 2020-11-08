@@ -104,7 +104,7 @@ function sendTransaction(isAdding) {
   }
 
   
-  trans.unshift(trans);
+  // trans.unshift(trans);
 
  
   populateChart();
